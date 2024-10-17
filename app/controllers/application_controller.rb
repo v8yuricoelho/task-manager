@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
+  protect_from_forgery with: :null_session
+
   SECRET_KEY = ENV['JWT_SECRET'] || 'secret'
 
   def decode_token
@@ -12,11 +14,11 @@ class ApplicationController < ActionController::Base
     nil
   end
 
-  def current_user
+  def current_user_id
     decoded = decode_token
     return nil unless decoded
 
-    @current_user ||= User.find_by(id: decoded['user_id']) if decoded
+    decoded['user_id']
   end
 
   def authenticate_user!
