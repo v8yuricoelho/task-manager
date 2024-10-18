@@ -22,6 +22,6 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate_user!
-    render json: { error: 'Unauthorized' }, status: :unauthorized unless current_user
+    render json: { error: 'Unauthorized' }, status: :unauthorized unless current_user_id
   end
 end
