@@ -15,6 +15,10 @@ class TasksController < ApplicationController
     end
   end
 
+  def index
+    @tasks = Task.where(user_id: current_user_id)
+  end
+
   private
 
   def task_params

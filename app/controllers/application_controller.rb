@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
+  include ActionController::Cookies
   protect_from_forgery with: :null_session
 
   SECRET_KEY = ENV['JWT_SECRET'] || 'secret'
 
   def decode_token
-    token = request.headers['Authorization']&.split(' ')&.last
+    token = ENV['AUTH_TOKEN']
     JWT.decode(token, SECRET_KEY)[0]
   rescue JWT::DecodeError
     nil
@@ -22,6 +23,6 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate_user!
-    render json: { error: 'Unauthorized' }, status: :unauthorized unless current_user_id
+    redirect_to sessions_new_path, alert: 'You must be logged in to access this page.' unless current_user_id
   end
 end
