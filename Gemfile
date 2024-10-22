@@ -52,7 +52,11 @@ gem 'bootsnap', require: false
 
 gem 'aws-sdk-sqs'
 
+gem 'bootstrap', '~> 5.3.3'
+
 gem 'jwt'
+
+gem 'dartsass-sprockets'
 
 gem 'shoryuken'
 
