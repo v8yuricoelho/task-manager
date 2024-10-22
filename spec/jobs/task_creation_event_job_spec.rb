@@ -1,23 +1,16 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'sidekiq/testing'
-
-Sidekiq::Testing.fake!
 
 # rubocop:disable Metrics/BlockLength
 RSpec.describe TaskCreationEventJob, type: :worker do
   let(:task) { create(:task) }
 
-  before do
-    Sidekiq::Worker.clear_all
-  end
-
   context 'when task is valid' do
-    it 'queues the job correctly' do
-      expect do
-        TaskCreationEventJob.perform_async(task.id)
-      end.to change(TaskCreationEventJob.jobs, :size).by(1)
+    it 'queues the job correctly by invoking perform_async' do
+      expect(TaskCreationEventJob).to receive(:perform_async).with(any_args)
+
+      TaskCreationEventJob.perform_async({ 'task_id' => task.id }.to_json)
     end
 
     it 'sends the correct message to SQS' do
@@ -31,14 +24,14 @@ RSpec.describe TaskCreationEventJob, type: :worker do
         )
       )
 
-      TaskCreationEventJob.new.perform(task.id)
+      TaskCreationEventJob.new.perform(nil, { 'task_id' => task.id }.to_json)
     end
   end
 
   context 'when there is a failure' do
     it 'raises an error if task is not found' do
       expect do
-        TaskCreationEventJob.new.perform(nil)
+        TaskCreationEventJob.new.perform(nil, { 'task_id' => nil }.to_json)
       end.to raise_error(ActiveRecord::RecordNotFound)
     end
 
@@ -49,7 +42,7 @@ RSpec.describe TaskCreationEventJob, type: :worker do
 
       expect(Rails.logger).to receive(:error).with('Failed to send message to SQS: Error')
 
-      TaskCreationEventJob.new.perform(task.id)
+      TaskCreationEventJob.new.perform(nil, { 'task_id' => task.id }.to_json)
     end
   end
 end

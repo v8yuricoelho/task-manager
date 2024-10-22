@@ -8,7 +8,7 @@ class TasksController < ApplicationController
     @task.user_id = current_user_id
 
     if @task.save
-      TaskCreationEventJob.perform_async(@task.id)
+      TaskCreationEventJob.perform_async({ task_id: @task.id })
       render json: @task, status: :created
     else
       render json: @task.errors, status: :unprocessable_entity

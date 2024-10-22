@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 class TaskCreationEventJob
-  include Sidekiq::Worker
-  sidekiq_options queue: 'tasks_queue'
+  include Shoryuken::Worker
+  shoryuken_options queue: 'tasks_queue', auto_delete: true
 
-  def perform(task_id)
+  def perform(_sqs_msg, task_data)
+    task_id = JSON.parse(task_data)['task_id']
     task = Task.find(task_id)
 
     message_body = {
