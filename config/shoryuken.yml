@@ -6,3 +6,4 @@ development:
   concurrency: 5
   queues:
     - tasks_queue
+    - status_updates_queue
