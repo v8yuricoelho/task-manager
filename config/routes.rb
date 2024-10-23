@@ -9,5 +9,5 @@ Rails.application.routes.draw do
   get 'sessions/new'
   get 'registrations/new'
 
-  resources :tasks, only: %i[create index show]
+  resources :tasks, only: %i[create index show destroy]
 end
