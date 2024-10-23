@@ -3,15 +3,19 @@
 class TasksController < ApplicationController
   before_action :authenticate_user!
 
+  def new
+    @task = Task.new
+  end
+
   def create
     @task = Task.new(task_params)
     @task.user_id = current_user_id
 
     if @task.save
       TaskCreationEventJob.perform_async(@task.id)
-      render json: @task, status: :created
+      redirect_to tasks_path, notice: 'Task was successfully created.'
     else
-      render json: @task.errors, status: :unprocessable_entity
+      render :new
     end
   end
 
